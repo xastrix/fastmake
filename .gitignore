@@ -1,0 +1,9 @@
+.vs/
+
+bin/
+obj/
+
+fastmake.sln
+src/fastmake.vcxproj
+src/fastmake.vcxproj.user
+src/fastmake.vcxproj.filters

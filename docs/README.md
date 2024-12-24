@@ -1,6 +1,9 @@
 # fastmake-docs
 ## Samples
 #### Sample (Hello world written in C)
+```
+fastmake docs/samples/hello_world_c
+```
 fastmake-file
 ```json
 {
@@ -24,19 +27,32 @@ int main() {
 }
 ```
 ## Project settings (Json)
-#### Project name
+### Project name
 ```json
 "name":"MyFirstProject", /* Example name of VS project (MyFirstProject.vcxproj, MyFirstProject.vcxproj.user) */
 "settings": { ...
 ```
-#### Platforms
+##### Note
+How to get project name
+```
+{$name}
+```
+Example
+```json
+"settings": {
+  ...,
+  "links":["{$name}_lib.lib"], /* MyFirstProject_lib.lib */
+  ...
+}
+```
+### Platforms
 ```json
 "settings": {
   "platforms":["x86","x64"], /* Example platforms */
   ...
 }
 ```
-#### Configurations
+### Configurations
 ```json
 "settings": {
   ...,
@@ -44,7 +60,7 @@ int main() {
   ...
 }
 ```
-#### Linking
+### Linking
 ```json
 "settings": {
   ...,
@@ -52,7 +68,7 @@ int main() {
   ...
 }
 ```
-#### Link options
+### Link options
 ```json
 "settings": {
   ...,
@@ -60,7 +76,7 @@ int main() {
   ...
 }
 ```
-#### Output directory
+### Output directory
 ```json
 "settings": {
   ...,
@@ -69,7 +85,7 @@ int main() {
   ...
 }
 ```
-#### Intermediate directory
+### Intermediate directory
 ```json
 "settings": {
   ...,
@@ -78,7 +94,7 @@ int main() {
   ...
 }
 ```
-#### Include directories
+### Include directories
 ```json
 "settings": {
   ...,
@@ -86,7 +102,7 @@ int main() {
   ...
 }
 ```
-#### Library directories
+### Library directories
 ```json
 "settings": {
   ...,
@@ -94,7 +110,7 @@ int main() {
   ...
 }
 ```
-#### Preprocessor defines
+### Preprocessor defines
 ```json
 "settings": {
   ...,
@@ -102,7 +118,7 @@ int main() {
   ...
 }
 ```
-#### Optimization
+### Optimization
 ```json
 "settings": {
   ...,
@@ -114,7 +130,7 @@ int main() {
   ...
 }
 ```
-#### Character set
+### Character set
 ```json
 "settings": {
   ...,
@@ -125,7 +141,7 @@ int main() {
   ...
 }
 ```
-#### Warning level
+### Warning level
 ```json
 "settings": {
   ...,
@@ -137,7 +153,7 @@ int main() {
   ...
 }
 ```
-#### Precompiled headers
+### Precompiled headers
 ```json
 "settings": {
   ...,
@@ -147,7 +163,7 @@ int main() {
   ...
 }
 ```
-#### Function level linking
+### Function level linking
 ```json
 "settings": {
   ...,
@@ -157,7 +173,7 @@ int main() {
   ...
 }
 ```
-#### Platformtoolset
+### Platformtoolset
 ```json
 "settings": {
   ...,
@@ -177,7 +193,7 @@ int main() {
   ...
 }
 ```
-#### Files
+### Files
 ```json
 "settings": {
   ...,

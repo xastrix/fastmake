@@ -33,11 +33,6 @@ bool fs::exists(const std::string& path)
 	return std::filesystem::exists(path);
 }
 
-bool fs::is_empty(const std::string& path)
-{
-	return std::filesystem::is_empty(path);
-}
-
 std::string fs::get_file_contents(const std::string& path)
 {
 	std::string buf;

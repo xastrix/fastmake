@@ -22,13 +22,6 @@ struct fs {
 	bool exists(const std::string& path);
 
 	/**
-	 * Check if folder is empty
-	 * @param path
-	 * @return true/false
-	*/
-	bool is_empty(const std::string& path);
-
-	/**
 	 * Get content from file
 	 * @param path
 	 * @return string

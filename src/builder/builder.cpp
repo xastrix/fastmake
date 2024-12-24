@@ -93,7 +93,7 @@ b_err builder::run(const std::string& path)
 bool builder::build_solution_file(const std::string& path)
 {
 	std::string output{};
-	std::string project_guid = g_utils.get_guid();
+	std::string project_guid{ g_utils.get_guid() };
 
 	output += "Microsoft Visual Studio Solution File, Format Version 12.00\n";
 	output += "# Visual Studio 15\n";

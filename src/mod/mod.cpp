@@ -8,20 +8,18 @@ mod g_mod;
 bool mod::initialize(const std::string& path)
 {
 	if (!g_fs.find_files_in_directories(path, SOURCE_PROJECT_CONFIGURATION_FILENAME, source_path)) {
-		err_msg = "Error: The settings file '" SOURCE_PROJECT_CONFIGURATION_FILENAME "' was not found in the directory '" + path + "'";
+		err_msg = "Error: The settings file (" SOURCE_PROJECT_CONFIGURATION_FILENAME ") was not found in the directory '" + path + "'";
 		return false;
 	}
 
 	std::string data{ g_fs.get_file_contents(source_path) };
 
-	/*
-	* data = g_utils.replace_patterns(data,
-	*	{ "{$name}" }, { g_mod.get_project_name() }
-	* );
-	*/
+	data = g_utils.replace_patterns(data,
+		{ "{$name}" }, { g_mod.get_project_name() }
+	);
 
 	if (!json_module_reader.parse(data, json_module_data)) {
-		err_msg = "Error: Failed to parse the settings file '" SOURCE_PROJECT_CONFIGURATION_FILENAME "'";
+		err_msg = "Error: Failed to parse the settings file (" SOURCE_PROJECT_CONFIGURATION_FILENAME ")";
 		return false;
 	}
 

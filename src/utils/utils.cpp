@@ -4,8 +4,6 @@
 #include <cctype>
 #include <algorithm>
 
-utils g_utils;
-
 std::string utils::replace_patterns(const std::string& input,
 	const std::vector<std::string>& a_list,
 	const std::vector<std::string>& b_list) {

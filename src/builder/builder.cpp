@@ -68,7 +68,7 @@ b_err builder::run(const std::string& path)
 		if (platform.asString() == "x86")
 			platform = "Win32";
 
-	project_guid = g_utils.get_guid();
+	project_guid = utils::get_guid();
 
 	printf("-- Generating %s%s...\n", g_mod.get_project_name().c_str(), VS_PROJECT_SOLUTION_EXTENSION);
 
@@ -98,7 +98,7 @@ bool builder::build_solution_file(const std::string& path)
 
 	output += "Microsoft Visual Studio Solution File, Format Version 12.00\n";
 	output += "# Visual Studio 15\n";
-	output += "Project(\"{" + g_utils.get_guid() + "}\") = \"" + g_mod.get_project_name() + "\", \"" + g_mod.get_project_name() + ".vcxproj\", \"{" + project_guid + "}\"\n";
+	output += "Project(\"{" + utils::get_guid() + "}\") = \"" + g_mod.get_project_name() + "\", \"" + g_mod.get_project_name() + ".vcxproj\", \"{" + project_guid + "}\"\n";
 	output += "EndProject\n";
 	output += "Global\n";
 
@@ -140,7 +140,7 @@ bool builder::build_solution_file(const std::string& path)
 	output += "EndGlobal";
 	output += "\n";
 
-	return g_fs.create_object(path + VS_PROJECT_SOLUTION_EXTENSION, output);
+	return FS::create_object(path + VS_PROJECT_SOLUTION_EXTENSION, output);
 }
 
 bool builder::build_vcxproj(const std::string& path)
@@ -175,7 +175,7 @@ bool builder::build_vcxproj(const std::string& path)
 	}
 	set_end_base(output);
 
-	return g_fs.create_object(path + VS_PROJECT_EXTENSION, output);
+	return FS::create_object(path + VS_PROJECT_EXTENSION, output);
 }
 
 bool builder::build_vcxproj_user(const std::string& path)
@@ -199,7 +199,7 @@ bool builder::build_vcxproj_user(const std::string& path)
 	}
 	set_end_base(output);
 
-	return g_fs.create_object(path + VS_PROJECT_USER_EXTENSION, output);
+	return FS::create_object(path + VS_PROJECT_USER_EXTENSION, output);
 }
 
 void builder::set_base(xml_string& string)
@@ -784,22 +784,22 @@ void builder::set_end_base(xml_string& string)
 static bool is_cpp(const Json::Value& object)
 {
 	return
-		g_utils.get_file_extension(object.asString()) == "c" ||
-		g_utils.get_file_extension(object.asString()) == "cc" ||
-		g_utils.get_file_extension(object.asString()) == "cpp";
+		utils::get_file_extension(object.asString()) == "c" ||
+		utils::get_file_extension(object.asString()) == "cc" ||
+		utils::get_file_extension(object.asString()) == "cpp";
 }
 
 static bool is_hpp(const Json::Value& object)
 {
 	return
-		g_utils.get_file_extension(object.asString()) == "h" ||
-		g_utils.get_file_extension(object.asString()) == "hh" ||
-		g_utils.get_file_extension(object.asString()) == "hpp";
+		utils::get_file_extension(object.asString()) == "h" ||
+		utils::get_file_extension(object.asString()) == "hh" ||
+		utils::get_file_extension(object.asString()) == "hpp";
 }
 
 static bool is_lib(const Json::Value& object)
 {
-	return g_utils.get_file_extension(object.asString()) == "lib";
+	return utils::get_file_extension(object.asString()) == "lib";
 }
 
 static void fast_link(xml_string& string, const xml_string& param)

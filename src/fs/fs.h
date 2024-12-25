@@ -5,7 +5,8 @@
 
 #define FS_FORBIDDEN_CHARS "<>:\"/\\|?*"
 
-struct fs {
+namespace FS
+{
 	/**
 	 * Create a object (file)
 	 * @param path where the file will be stored
@@ -13,13 +14,6 @@ struct fs {
 	 * @return true/false
 	*/
 	bool create_object(const std::string& path, const std::string& data);
-
-	/**
-	 * Check if file is exists
-	 * @param path
-	 * @return true/false
-	*/
-	bool exists(const std::string& path);
 
 	/**
 	 * Get content from file
@@ -37,5 +31,3 @@ struct fs {
 	*/
 	bool find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path);
 };
-
-extern fs g_fs;

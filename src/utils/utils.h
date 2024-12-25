@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-struct utils {
+namespace utils
+{
 	/**
 	 * Replaces words in a_list with corresponding words from b_list by index
 	 * @param the input string where replacements will occur
@@ -35,6 +36,4 @@ struct utils {
 	 * @return string
 	*/
 	std::string get_file_extension(const std::string& filename);
-};
-
-extern utils g_utils;
+}

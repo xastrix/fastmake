@@ -2,14 +2,12 @@
 
 #include <windows.h>
 
-fs g_fs;
-
-bool fs::create_object(const std::string& path, const std::string& data)
+bool FS::create_object(const std::string& path, const std::string& data)
 {
 	std::filesystem::path file_path = path;
 	std::filesystem::path dir_path = file_path.parent_path();
 
-	if (!exists(dir_path.string()))
+	if (!std::filesystem::is_directory(dir_path))
 		std::filesystem::create_directories(dir_path);
 
 	HANDLE h = CreateFileA(path.c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
@@ -28,12 +26,7 @@ bool fs::create_object(const std::string& path, const std::string& data)
 	return true;
 }
 
-bool fs::exists(const std::string& path)
-{
-	return std::filesystem::exists(path);
-}
-
-std::string fs::get_file_contents(const std::string& path)
+std::string FS::get_file_contents(const std::string& path)
 {
 	std::string buf;
 
@@ -63,7 +56,7 @@ std::string fs::get_file_contents(const std::string& path)
 	return buf;
 }
 
-bool fs::find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path)
+bool FS::find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path)
 {
 	bool ret = false;
 

@@ -42,4 +42,5 @@ private:
 private:
 	Json::Value cfg_obj;
 	Json::Value platform_obj;
+	std::string project_guid;
 };

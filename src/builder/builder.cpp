@@ -68,6 +68,8 @@ b_err builder::run(const std::string& path)
 		if (platform.asString() == "x86")
 			platform = "Win32";
 
+	project_guid = g_utils.get_guid();
+
 	printf("-- Generating %s%s...\n", g_mod.get_project_name().c_str(), VS_PROJECT_SOLUTION_EXTENSION);
 
 	if (!build_solution_file(path))
@@ -93,7 +95,6 @@ b_err builder::run(const std::string& path)
 bool builder::build_solution_file(const std::string& path)
 {
 	std::string output{};
-	std::string project_guid{ g_utils.get_guid() };
 
 	output += "Microsoft Visual Studio Solution File, Format Version 12.00\n";
 	output += "# Visual Studio 15\n";
@@ -217,7 +218,7 @@ void builder::set_globals(xml_string& string)
 	string += xml_string(2, ' ') + "<PropertyGroup Label=\"Globals\">";
 	string += "\n";
 	{
-		string += xml_string(4, ' ') + "<ProjectGuid>" + std::string{ "{" + g_utils.get_guid() + "}" } + "</ProjectGuid>";
+		string += xml_string(4, ' ') + "<ProjectGuid>" + std::string{ "{" + project_guid + "}" } + "</ProjectGuid>";
 		string += "\n";
 
 		string += xml_string(4, ' ') + "<IgnoreWarnCompileDuplicatedFilename>" + "true" + "</IgnoreWarnCompileDuplicatedFilename>";
@@ -678,26 +679,22 @@ void builder::set_item_definition_groups(xml_string& string)
 void builder::set_cpp_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
+	std::vector<std::string> _source_files;
+	
+	for (const auto& file : files_obj)
+		if (is_cpp(file))
+			_source_files.push_back(file.asString());
 
-	bool is_has = false;
-
-	for (const auto& f : files_obj)
-		if (is_cpp(f))
-			is_has = true;
-
-	if (!is_has)
+	if (_source_files.empty())
 		return;
-
+	
 	string += xml_string(2, ' ') + "<ItemGroup>";
 	string += "\n";
 	{
-		for (const auto& f : files_obj)
+		for (const auto& f : _source_files)
 		{
-			if (is_cpp(f))
-			{
-				string += xml_string(4, ' ') + "<ClCompile Include=\"" + f.asString() + "\" />";
-				string += "\n";
-			}
+			string += xml_string(4, ' ') + "<ClCompile Include=\"" + f + "\" />";
+			string += "\n";
 		}
 	}
 	string += xml_string(2, ' ') + "</ItemGroup>";
@@ -707,26 +704,22 @@ void builder::set_cpp_files(xml_string& string)
 void builder::set_header_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
+	std::vector<std::string> _header_files;
 
-	bool is_has = false;
+	for (const auto& file : files_obj)
+		if (is_hpp(file))
+			_header_files.push_back(file.asString());
 
-	for (const auto& f : files_obj)
-		if (is_hpp(f))
-			is_has = true;
-
-	if (!is_has)
+	if (_header_files.empty())
 		return;
 
 	string += xml_string(2, ' ') + "<ItemGroup>";
 	string += "\n";
 	{
-		for (const auto& f : files_obj)
+		for (const auto& f : _header_files)
 		{
-			if (is_hpp(f))
-			{
-				string += xml_string(4, ' ') + "<ClCompile Include=\"" + f.asString() + "\" />";
-				string += "\n";
-			}
+			string += xml_string(4, ' ') + "<ClCompile Include=\"" + f + "\" />";
+			string += "\n";
 		}
 	}
 	string += xml_string(2, ' ') + "</ItemGroup>";
@@ -736,26 +729,22 @@ void builder::set_header_files(xml_string& string)
 void builder::set_library_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
+	std::vector<std::string> _library_files;
 
-	bool is_has = false;
+	for (const auto& file : files_obj)
+		if (is_lib(file))
+			_library_files.push_back(file.asString());
 
-	for (const auto& f : files_obj)
-		if (is_lib(f))
-			is_has = true;
-
-	if (!is_has)
+	if (_library_files.empty())
 		return;
 
 	string += xml_string(2, ' ') + "<ItemGroup>";
 	string += "\n";
 	{
-		for (const auto& f : files_obj)
+		for (const auto& f : _library_files)
 		{
-			if (is_lib(f))
-			{
-				string += xml_string(4, ' ') + "<Library Include=\"" + f.asString() + "\" />";
-				string += "\n";
-			}
+			string += xml_string(4, ' ') + "<Library Include=\"" + f + "\" />";
+			string += "\n";
 		}
 	}
 	string += xml_string(2, ' ') + "</ItemGroup>";
@@ -765,26 +754,22 @@ void builder::set_library_files(xml_string& string)
 void builder::set_unknown_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
+	std::vector<std::string> _other_files;
 
-	bool is_has = false;
+	for (const auto& file : files_obj)
+		if (!is_cpp(file) && !is_hpp(file) && !is_lib(file))
+			_other_files.push_back(file.asString());
 
-	for (const auto& f : files_obj)
-		if (!is_cpp(f) && !is_hpp(f) && !is_lib(f))
-			is_has = true;
-
-	if (!is_has)
+	if (_other_files.empty())
 		return;
 
 	string += xml_string(2, ' ') + "<ItemGroup>";
 	string += "\n";
 	{
-		for (const auto& f : files_obj)
+		for (const auto& f : _other_files)
 		{
-			if (!is_cpp(f) && !is_hpp(f) && !is_lib(f))
-			{
-				string += xml_string(4, ' ') + "<None Include=\"" + f.asString() + "\" />";
-				string += "\n";
-			}
+			string += xml_string(4, ' ') + "<None Include=\"" + f + "\" />";
+			string += "\n";
 		}
 	}
 	string += xml_string(2, ' ') + "</ItemGroup>";

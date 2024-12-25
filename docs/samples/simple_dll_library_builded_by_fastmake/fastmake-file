@@ -1,0 +1,12 @@
+{
+    "name":"DllProject",
+    "settings": {
+        "configurations":["Debug", "Release"],
+        "platforms":["x64", "x86"],
+		"configuration_type":"dynamic",
+		"sub_system":"lib",
+        "files":[
+          "DllMain.cpp"
+        ]
+    }
+}

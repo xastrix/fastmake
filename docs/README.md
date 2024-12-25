@@ -39,6 +39,7 @@ How to get project name
 ```
 Example
 ```json
+"name":"MyFirstProject", /* Example name of VS project (MyFirstProject.vcxproj, MyFirstProject.vcxproj.user) */
 "settings": {
   ...,
   "links":["{$name}_lib.lib"], /* MyFirstProject_lib.lib */
@@ -48,6 +49,7 @@ Example
 ### Platforms
 ```json
 "settings": {
+  ...,
   "platforms":["x86","x64"], /* Example platforms */
   ...
 }
@@ -57,6 +59,31 @@ Example
 "settings": {
   ...,
   "configurations":["Debug","Release"], /* Example configurations */
+  ...
+}
+```
+### Configuration type
+```json
+"settings": {
+  ...,
+  "configuration_type":"app", /* Example configuration type */
+  /* "app"     - Application / .exe */
+  /* "dynamic" - DynamicLibrary / .dll */
+  /* "static"  - StaticLibrary / .lib */
+  // Application is a default
+  ...
+}
+```
+### Sub-system
+```json
+"settings": {
+  ...,
+  "sub_system":"console", /* Example sub-system */
+  /* "console"    - Console */
+  /* "windowed"   - Windows */
+  /* "lib"        - Windows */
+  /* "static_lib" - Windows */
+  // Console is a default
   ...
 }
 ```
@@ -98,7 +125,7 @@ Example
 ```json
 "settings": {
   ...,
-  "include_dirs":["$(ProjectDir)curl\\Include","$(DXSDK_DIR)Include"],
+  "include_dirs":["$(ProjectDir)curl\\Include","$(DXSDK_DIR)Include"], /* Example include directories */
   ...
 }
 ```
@@ -106,7 +133,7 @@ Example
 ```json
 "settings": {
   ...,
-  "lib_dirs":["$(ProjectDir)curl\\Lib\\x86","$(DXSDK_DIR)Lib\\x86"],
+  "lib_dirs":["$(ProjectDir)curl\\Lib\\x86","$(DXSDK_DIR)Lib\\x86"], /* Example library directories */
   ...
 }
 ```

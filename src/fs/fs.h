@@ -5,7 +5,7 @@
 
 #define FS_FORBIDDEN_CHARS "<>:\"/\\|?*"
 
-namespace FS
+namespace fs
 {
 	/**
 	 * Create a object (file)

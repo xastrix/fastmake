@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../mod/mod.h"
+#include <chrono>
 
 #define VS_PROJECT_SOLUTION_EXTENSION                  ".sln"
 #define VS_PROJECT_EXTENSION                           ".vcxproj"
@@ -44,3 +45,5 @@ private:
 	Json::Value platform_obj;
 	std::string project_guid;
 };
+
+extern builder g_builder;

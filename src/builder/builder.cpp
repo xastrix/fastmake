@@ -3,7 +3,7 @@
 #include "../utils/utils.h"
 #include "../fs/fs.h"
 
-#include <chrono>
+builder g_builder;
 
 static bool is_cpp(const Json::Value& object);
 static bool is_hpp(const Json::Value& object);
@@ -11,49 +11,9 @@ static bool is_lib(const Json::Value& object);
 static void fast_link(xml_string& string, const xml_string& param);
 static void fast_link_closed(xml_string& string, const xml_string& param, const xml_string& param1);
 
-int main(int argc, const char** argv)
-{
-	if (argc < 2) {
-		printf("usage: fastmake <path>\n");
-		printf("to get more information read's the docs\n");
-		return 1;
-	}
-
-	if (!g_mod.initialize(argv[1])) {
-		printf("%s\n", g_mod.get_err().c_str());
-		return 1;
-	}
-
-	auto start = std::chrono::high_resolution_clock::now();
-
-	builder builder;
-	switch (builder.run(g_mod.get_project_path())) {
-	case be_fail_access: {
-		printf("Error: Failed to create VS project files (Don't have permissions)\n");
-		break;
-	}
-	case be_configurations_empty: {
-		printf("Error: Configurations are empty\n");
-		break;
-	}
-	case be_platforms_empty: {
-		printf("Error: Platforms are empty\n");
-		break;
-	}
-	case be_ok: {
-		std::chrono::duration<double, std::milli> duration = std::chrono::high_resolution_clock::now() - start;
-		
-		printf("\n");
-		printf("-- Done (%.0f ms)\n", duration.count());
-	}
-	}
-
-	return 0;
-}
-
 b_err builder::run(const std::string& path)
 {
-	cfg_obj      = g_mod.get()["settings"]["configurations"];
+	cfg_obj = g_mod.get()["settings"]["configurations"];
 	platform_obj = g_mod.get()["settings"]["platforms"];
 
 	printf("-- Building...\n");
@@ -70,24 +30,24 @@ b_err builder::run(const std::string& path)
 
 	project_guid = utils::get_guid();
 
-	printf("-- Generating %s%s...\n", g_mod.get_project_name().c_str(), VS_PROJECT_SOLUTION_EXTENSION);
+	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
 
 	if (!build_solution_file(path))
 		return be_fail_access;
 
-	printf("-- %s%s OK\n", g_mod.get_project_name().c_str(), VS_PROJECT_SOLUTION_EXTENSION);
-	printf("-- Generating %s%s...\n", g_mod.get_project_name().c_str(), VS_PROJECT_EXTENSION);
+	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
+	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_EXTENSION }.c_str());
 
 	if (!build_vcxproj(path))
 		return be_fail_access;
 
-	printf("-- %s%s OK\n", g_mod.get_project_name().c_str(), VS_PROJECT_EXTENSION);
-	printf("-- Generating %s%s...\n", g_mod.get_project_name().c_str(), VS_PROJECT_USER_EXTENSION);
+	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_EXTENSION }.c_str());
+	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_USER_EXTENSION }.c_str());
 	
 	if (!build_vcxproj_user(path))
 		return be_fail_access;
 
-	printf("-- %s%s OK\n", g_mod.get_project_name().c_str(), VS_PROJECT_USER_EXTENSION);
+	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_USER_EXTENSION }.c_str());
 
 	return be_ok;
 }
@@ -140,7 +100,7 @@ bool builder::build_solution_file(const std::string& path)
 	output += "EndGlobal";
 	output += "\n";
 
-	return FS::create_object(path + VS_PROJECT_SOLUTION_EXTENSION, output);
+	return fs::create_object(path + VS_PROJECT_SOLUTION_EXTENSION, output);
 }
 
 bool builder::build_vcxproj(const std::string& path)
@@ -175,7 +135,7 @@ bool builder::build_vcxproj(const std::string& path)
 	}
 	set_end_base(output);
 
-	return FS::create_object(path + VS_PROJECT_EXTENSION, output);
+	return fs::create_object(path + VS_PROJECT_EXTENSION, output);
 }
 
 bool builder::build_vcxproj_user(const std::string& path)
@@ -199,7 +159,7 @@ bool builder::build_vcxproj_user(const std::string& path)
 	}
 	set_end_base(output);
 
-	return FS::create_object(path + VS_PROJECT_USER_EXTENSION, output);
+	return fs::create_object(path + VS_PROJECT_USER_EXTENSION, output);
 }
 
 void builder::set_base(xml_string& string)
@@ -234,7 +194,9 @@ void builder::set_globals(xml_string& string)
 		string += "\n";
 
 		string += xml_string(4, ' ') + "<LatestTargetPlatformVersion>";
-		string += "$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))";
+		{
+			string += "$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))";
+		}
 		string += "</LatestTargetPlatformVersion>";
 		string += "\n";
 
@@ -416,6 +378,7 @@ void builder::set_property_groups(xml_string& string)
 				{
 					if (outdir_obj.empty())
 						string += "bin\\" + platform.asString() + "\\" + config.asString() + "\\";
+
 					else
 						string += outdir_obj.asString();
 				}
@@ -426,6 +389,7 @@ void builder::set_property_groups(xml_string& string)
 				{
 					if (intdir_obj.empty())
 						string += "obj\\" + platform.asString() + "\\" + config.asString() + "\\";
+
 					else
 						string += intdir_obj.asString();
 				}
@@ -570,6 +534,7 @@ void builder::set_item_definition_groups(xml_string& string)
 					{
 						if (fll_obj.asString() == "on")
 							string += "true";
+
 						else
 							string += "false";
 					}

@@ -106,7 +106,7 @@ Example
 ```json
 "settings": {
   ...,
-  "configuration_type":"app", /* Example configuration type */
+  "configuration_type":"?",
   /* "app"     - Application / .exe */
   /* "dynamic" - DynamicLibrary / .dll */
   /* "static"  - StaticLibrary / .lib */
@@ -118,7 +118,7 @@ Example
 ```json
 "settings": {
   ...,
-  "sub_system":"console", /* Example sub-system */
+  "sub_system":"?",
   /* "console"    - Console */
   /* "windowed"   - Windows */
   /* "lib"        - Windows */

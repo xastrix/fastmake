@@ -19,7 +19,9 @@ project (proj)
 	   "src/fs/**",
 	   "src/mod/**",
 	   "src/utils/**",
-	   "src/builder/**"
+	   "src/builder/**",
+	   
+	   "src/*.cpp"
 	}
 
 	externalincludedirs "src/dependencies/jsoncpp/include"

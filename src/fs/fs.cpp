@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-bool FS::create_object(const std::string& path, const std::string& data)
+bool fs::create_object(const std::string& path, const std::string& data)
 {
 	std::filesystem::path file_path = path;
 	std::filesystem::path dir_path = file_path.parent_path();
@@ -26,7 +26,7 @@ bool FS::create_object(const std::string& path, const std::string& data)
 	return true;
 }
 
-std::string FS::get_file_contents(const std::string& path)
+std::string fs::get_file_contents(const std::string& path)
 {
 	std::string buf;
 
@@ -56,7 +56,7 @@ std::string FS::get_file_contents(const std::string& path)
 	return buf;
 }
 
-bool FS::find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path)
+bool fs::find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path)
 {
 	bool ret = false;
 

@@ -7,12 +7,12 @@ mod g_mod;
 
 bool mod::initialize(const std::string& path)
 {
-	if (!FS::find_files_in_directories(path, SOURCE_PROJECT_CONFIGURATION_FILENAME, source_path)) {
+	if (!fs::find_files_in_directories(path, SOURCE_PROJECT_CONFIGURATION_FILENAME, source_path)) {
 		err_msg = "Error: The settings file (" SOURCE_PROJECT_CONFIGURATION_FILENAME ") was not found in the directory '" + path + "'";
 		return false;
 	}
 
-	std::string data{ FS::get_file_contents(source_path) };
+	std::string data{ fs::get_file_contents(source_path) };
 
 	data = utils::replace_patterns(data,
 		{ "{$name}" }, { g_mod.get_project_name() }

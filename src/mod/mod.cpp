@@ -28,7 +28,12 @@ bool mod::initialize(const std::string& path)
 
 std::string mod::get_project_name()
 {
-	return utils::remove_char(json_module_data["name"].asString(), FS_FORBIDDEN_CHARS);
+	std::string name = json_module_data["name"].asString();
+
+	if (name.empty())
+		name = "UnnamedProject";
+
+	return utils::remove_char(name, FS_FORBIDDEN_CHARS);
 }
 
 std::string mod::get_project_path()

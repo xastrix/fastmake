@@ -69,7 +69,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 ## Project settings (Json)
 ### Project name
 ```json
-"name":"MyFirstProject", /* Example name of VS project (MyFirstProject.vcxproj, MyFirstProject.vcxproj.user) */
+"name":"MyFirstProject", /* Example name of VS project (MyFirstProject.sln, MyFirstProject.vcxproj, ...) */
+/* If skip, the default will be set to "UnnamedProject" */
 "settings": { ...
 ```
 ##### Note

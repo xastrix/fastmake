@@ -56,6 +56,7 @@ bool builder::build_solution_file(const std::string& path)
 {
 	std::string output{};
 
+	output += "\n";
 	output += "Microsoft Visual Studio Solution File, Format Version 12.00\n";
 	output += "# Visual Studio 15\n";
 	output += "Project(\"{" + utils::get_guid() + "}\") = \"" + g_mod.get_project_name() + "\", \"" + g_mod.get_project_name() + ".vcxproj\", \"{" + project_guid + "}\"\n";
@@ -125,10 +126,10 @@ bool builder::build_vcxproj(const std::string& path)
 
 		set_property_groups(output);
 		set_item_definition_groups(output);
-		set_cpp_files(output);
+		set_source_files(output);
 		set_header_files(output);
 		set_library_files(output);
-		set_unknown_files(output);
+		set_other_files(output);
 
 		fast_link(output, "<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />");
 		fast_link_closed(output, "<ImportGroup Label=\"ExtensionTargets\">", "</ImportGroup>");
@@ -588,8 +589,7 @@ void builder::set_item_definition_groups(xml_string& string)
 						if (subsys_obj.asString() == "console")
 							string += "Console";
 
-						else if (subsys_obj.asString() == "windowed" || subsys_obj.asString() == "lib" ||
-							subsys_obj.asString() == "static_lib")
+						else if (subsys_obj.asString() == "windowed" || subsys_obj.asString() == "lib")
 							string += "Windows";
 
 						else
@@ -641,7 +641,7 @@ void builder::set_item_definition_groups(xml_string& string)
 	}
 }
 
-void builder::set_cpp_files(xml_string& string)
+void builder::set_source_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _source_files;
@@ -716,7 +716,7 @@ void builder::set_library_files(xml_string& string)
 	string += "\n";
 }
 
-void builder::set_unknown_files(xml_string& string)
+void builder::set_other_files(xml_string& string)
 {
 	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _other_files;

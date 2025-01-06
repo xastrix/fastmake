@@ -1,12 +1,45 @@
 #include "builder/builder.h"
+#include "fs/fs.h"
 
 int main(int argc, const char** argv)
 {
 	if (argc < 2) {
 		printf("usage: fastmake <path>\n");
-		printf("                 path - Directory with %s\n", SOURCE_PROJECT_CONFIGURATION_FILENAME);
 		printf("to get more information read's the docs\n");
-		printf("docs: https://github.com/xastrix/fastmake/tree/master/docs\n");
+
+		char* files[MAX_FILES];
+		int   file_num = 0;
+
+		fs::get_directory_files(".", files, &file_num, fmRecursive);
+
+		for (int i = 0; i < file_num; i++)
+		{
+			if (std::filesystem::is_regular_file(files[i]))
+			{
+				if (strstr(files[i], SOURCE_PROJECT_CONFIGURATION_FILENAME) != 0)
+				{
+					std::string file_path = std::filesystem::path{ files[i] }.parent_path().string();
+					std::string path, target_path = file_path.empty() ? "." : file_path;
+
+					if (fs::find_files_in_directories(target_path, SOURCE_PROJECT_CONFIGURATION_FILENAME, path))
+					{
+						if (g_mod.initialize(target_path))
+						{
+							printf("\n");
+							printf("A project '%s' found!\n", g_mod.get_project_name().c_str());
+							printf("type \"fastmake %s\" to build project\n", std::filesystem::path{ path }.parent_path().string().c_str());
+						}
+					}
+				}
+			}
+			else if (std::filesystem::is_directory(files[i]))
+			{
+				int new_num = 0;
+				fs::get_directory_files(files[i], files, &new_num, fmRecursive);
+				file_num += new_num;
+			}
+		}
+
 		return 1;
 	}
 
@@ -31,10 +64,8 @@ int main(int argc, const char** argv)
 		break;
 	}
 	case be_ok: {
-		std::chrono::duration<double, std::milli> duration = std::chrono::high_resolution_clock::now() - start;
-
-		printf("\n");
-		printf("-- Done (%.0f ms)\n", duration.count());
+		printf("-- Done (%.0f ms)\n", std::chrono::duration<double, std::milli> {
+			std::chrono::high_resolution_clock::now() - start }.count());
 	}
 	}
 

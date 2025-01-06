@@ -63,15 +63,66 @@ bool fs::find_files_in_directories(const std::string& dirname, const std::string
 	if (!std::filesystem::is_directory(dirname))
 		return ret;
 
-	for (const auto& entry : std::filesystem::recursive_directory_iterator(dirname))
+	for (const auto& entry : std::filesystem::directory_iterator(dirname))
 	{
-		if (entry.path().filename().string().find(keyword) != std::string::npos)
+		if (entry.is_regular_file())
 		{
-			path = entry.path().string();
-			ret = true;
-			break;
+			if (entry.path().filename().string() == keyword)
+			{
+				path = entry.path().string();
+				ret = true;
+				break;
+			}
 		}
 	}
 
 	return ret;
+}
+
+void fs::get_directory_files(const std::string& dirname, char** files, int* num, find_mode mode)
+{
+	WIN32_FIND_DATA data;
+	HANDLE h;
+
+	char path[MAX_PATH];
+
+	if (dirname == ".")
+		sprintf(path, "*.*");
+	else
+		sprintf(path, "%s\\*.*", dirname.c_str());
+
+	h = FindFirstFileA(path, &data);
+
+	do {
+		if (strcmp(data.cFileName, ".") == 0 || strcmp(data.cFileName, "..") == 0)
+			continue;
+
+		if ((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && mode == fmFiles)
+			continue;
+
+		char path[MAX_PATH];
+
+		if (dirname == ".")
+			sprintf(path, "%s", data.cFileName);
+		else
+			sprintf(path, "%s\\%s", dirname.c_str(), data.cFileName);
+
+		if ((data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			if (mode == fmRecursive) {
+				get_directory_files(path, files, num, fmRecursive);
+			}
+			continue;
+		}
+
+		if (*num < MAX_FILES) {
+			files[*num] = new char[strlen(path) + 1];
+			if (files[*num] != NULL) {
+				strcpy_s(files[*num], strlen(path) + 1, path);
+				(*num)++;
+			}
+		}
+
+	} while (FindNextFileA(h, &data) != 0);
+
+	FindClose(h);
 }

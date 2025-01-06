@@ -31,7 +31,7 @@ std::string mod::get_project_name()
 	std::string name = json_module_data["name"].asString();
 
 	if (name.empty())
-		name = "UnnamedProject";
+		name = UNKNOWN_PROJECT_PATTERN_STRING;
 
 	return utils::remove_char(name, FS_FORBIDDEN_CHARS);
 }

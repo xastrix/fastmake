@@ -123,7 +123,6 @@ Example
   /* "console"    - Console */
   /* "windowed"   - Windows */
   /* "lib"        - Windows */
-  /* "static_lib" - Windows */
   // Console is a default
   ...
 }

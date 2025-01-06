@@ -3,7 +3,13 @@
 #include <filesystem>
 #include <string>
 
+#define MAX_FILES          1024
 #define FS_FORBIDDEN_CHARS "<>:\"/\\|?*"
+
+typedef enum {
+	fmFiles,
+	fmRecursive,
+} find_mode;
 
 namespace fs
 {
@@ -30,4 +36,13 @@ namespace fs
 	 * @return true/false
 	*/
 	bool find_files_in_directories(const std::string& dirname, const std::string& keyword, std::string& path);
+
+	/*
+	 * Getting the list of files in the specified directory
+	 * @param dirname
+	 * @param allocated array for the list
+	 * @param number of files found in the directory
+	 * @param file search type (fmFiles - search for files only, fmRecursive - search for files and folders)
+	*/
+	void get_directory_files(const std::string& dirname, char** files, int* num, find_mode mode);
 };

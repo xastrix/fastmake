@@ -35,10 +35,10 @@ private:
 	void set_import_configurations(xml_string& string);
 	void set_property_groups(xml_string& string);
 	void set_item_definition_groups(xml_string& string);
-	void set_cpp_files(xml_string& string);
+	void set_source_files(xml_string& string);
 	void set_header_files(xml_string& string);
 	void set_library_files(xml_string& string);
-	void set_unknown_files(xml_string& string);
+	void set_other_files(xml_string& string);
 	void set_end_base(xml_string& string);
 private:
 	Json::Value cfg_obj;

@@ -4,6 +4,7 @@
 #include <string>
 
 #define SOURCE_PROJECT_CONFIGURATION_FILENAME "fastmake-file"
+#define UNKNOWN_PROJECT_PATTERN_STRING        "UnnamedProject"
 
 struct mod {
 	/**

@@ -2,7 +2,7 @@
 ## Samples
 #### Sample (Hello world written in C)
 ```
-fastmake docs/samples/hello_world_c
+fastmake ../../docs/samples/hello_world_c
 ```
 fastmake-file
 ```json
@@ -28,7 +28,7 @@ int main() {
 ```
 #### Sample #2 (Simple dll-library project)
 ```
-fastmake docs/samples/simple_dll_library_builded_by_fastmake
+fastmake ../../docs/samples/simple_dll_library_builded_by_fastmake
 ```
 fastmake-file
 ```json
@@ -80,7 +80,7 @@ How to get project name
 ```
 Example
 ```json
-"name":"MyFirstProject", /* Example name of VS project (MyFirstProject.vcxproj, MyFirstProject.vcxproj.user) */
+"name":"MyFirstProject", /* Example name of VS project (MyFirstProject.sln, MyFirstProject.vcxproj, ...) */
 "settings": {
   ...,
   "links":["{$name}_lib.lib"], /* MyFirstProject_lib.lib */

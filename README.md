@@ -1,6 +1,6 @@
 <img align="left" src="https://github.com/xastrix/fastmake/blob/master/media/logo.png" width="120">
 <h3>fastmake</h3>
-<p>A fast build system for Visual Studio projects</p>
+<p>A fast build system for Visual Studio C/C++ projects</p>
 <h2>Usage</h2>
 <pre>fastmake &lt;path&gt;</pre>
 <p align="right">Check <a href="https://github.com/xastrix/fastmake/tree/master/docs">docs/README.md</a> for instructions on how to use it</p>

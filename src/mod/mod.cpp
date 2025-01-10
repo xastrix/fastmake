@@ -38,7 +38,7 @@ std::string mod::get_project_name()
 
 std::string mod::get_project_path()
 {
-	return std::filesystem::path{ source_path }.parent_path().string() + "\\" + get_project_name();
+	return std::filesystem::path{ source_path }.parent_path().string();
 }
 
 std::string mod::get_err()

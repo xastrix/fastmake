@@ -50,7 +50,7 @@ int main(int argc, const char** argv)
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	switch (g_builder.run(g_mod.get_project_path())) {
+	switch (g_builder.run()) {
 	case be_fail_access: {
 		printf("Error: Failed to create Visual Studio project files (Don't have permissions)\n");
 		break;
@@ -61,6 +61,10 @@ int main(int argc, const char** argv)
 	}
 	case be_platforms_empty: {
 		printf("Error: Platforms are empty\n");
+		break;
+	}
+	case be_files_empty: {
+		printf("Error: Files are empty\n");
 		break;
 	}
 	case be_ok: {

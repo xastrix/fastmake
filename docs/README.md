@@ -266,7 +266,8 @@ Example
   ...,
   "files":[
     "Source.cpp",  /* Example source file */
-    "Header.h" /* Example header file */
+    "Header.h", /* Example header file */
+	"dirname" /* Include all files (*.c, *.h and etc) from directory */
   ]
 }
 ```

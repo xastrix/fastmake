@@ -45,4 +45,4 @@ namespace fs
 	 * @param file search type (fmFiles - search for files only, fmRecursive - search for files and folders)
 	*/
 	void get_directory_files(const std::string& dirname, char** files, int* num, find_mode mode);
-};
+}

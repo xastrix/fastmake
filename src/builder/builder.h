@@ -14,15 +14,15 @@ enum b_err {
 	be_fail_access,
 	be_platforms_empty,
 	be_configurations_empty,
+	be_files_empty,
 };
 
 struct builder {
 	/**
 	 * Build visual studio project
-	 * @param Path to save
 	 * @return index of b_err
 	*/
-	b_err run(const std::string& path);
+	b_err run();
 private:
 	bool build_solution_file(const std::string& path);
 	bool build_vcxproj(const std::string& path);
@@ -43,7 +43,10 @@ private:
 private:
 	Json::Value cfg_obj;
 	Json::Value platform_obj;
+	Json::Value files_obj;
 	std::string project_guid;
+	std::string project_name;
+	std::string project_path;
 };
 
 extern builder g_builder;

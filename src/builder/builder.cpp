@@ -5,16 +5,17 @@
 
 builder g_builder;
 
-static bool is_cpp(const Json::Value& object);
-static bool is_hpp(const Json::Value& object);
-static bool is_lib(const Json::Value& object);
+static bool is_cpp(const std::string& object);
+static bool is_hpp(const std::string& object);
+static bool is_lib(const std::string& object);
 static void fast_link(xml_string& string, const xml_string& param);
 static void fast_link_closed(xml_string& string, const xml_string& param, const xml_string& param1);
 
-b_err builder::run(const std::string& path)
+b_err builder::run()
 {
 	cfg_obj = g_mod.get()["settings"]["configurations"];
 	platform_obj = g_mod.get()["settings"]["platforms"];
+	files_obj = g_mod.get()["settings"]["files"];
 
 	printf("-- Building...\n");
 
@@ -24,30 +25,35 @@ b_err builder::run(const std::string& path)
 	if (platform_obj.empty())
 		return be_platforms_empty;
 
+	if (files_obj.empty())
+		return be_files_empty;
+
 	for (auto& platform : platform_obj)
 		if (platform.asString() == "x86")
 			platform = "Win32";
 
 	project_guid = utils::get_guid();
+	project_name = g_mod.get_project_name();
+	project_path = g_mod.get_project_path();
 
-	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
+	printf("-- Generating %s...\n", std::string{ project_name + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
 
-	if (!build_solution_file(path))
+	if (!build_solution_file(project_path + "\\" + project_name))
 		return be_fail_access;
 
-	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
-	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_EXTENSION }.c_str());
+	printf("-- %s OK\n", std::string{ project_name + VS_PROJECT_SOLUTION_EXTENSION }.c_str());
+	printf("-- Generating %s...\n", std::string{ project_name + VS_PROJECT_EXTENSION }.c_str());
 
-	if (!build_vcxproj(path))
+	if (!build_vcxproj(project_path + "\\" + project_name))
 		return be_fail_access;
 
-	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_EXTENSION }.c_str());
-	printf("-- Generating %s...\n", std::string{ g_mod.get_project_name() + VS_PROJECT_USER_EXTENSION }.c_str());
+	printf("-- %s OK\n", std::string{ project_name + VS_PROJECT_EXTENSION }.c_str());
+	printf("-- Generating %s...\n", std::string{ project_name + VS_PROJECT_USER_EXTENSION }.c_str());
 	
-	if (!build_vcxproj_user(path))
+	if (!build_vcxproj_user(project_path + "\\" + project_name))
 		return be_fail_access;
 
-	printf("-- %s OK\n", std::string{ g_mod.get_project_name() + VS_PROJECT_USER_EXTENSION }.c_str());
+	printf("-- %s OK\n", std::string{ project_name + VS_PROJECT_USER_EXTENSION }.c_str());
 
 	return be_ok;
 }
@@ -59,7 +65,7 @@ bool builder::build_solution_file(const std::string& path)
 	output += "\n";
 	output += "Microsoft Visual Studio Solution File, Format Version 12.00\n";
 	output += "# Visual Studio 15\n";
-	output += "Project(\"{" + utils::get_guid() + "}\") = \"" + g_mod.get_project_name() + "\", \"" + g_mod.get_project_name() + ".vcxproj\", \"{" + project_guid + "}\"\n";
+	output += "Project(\"{" + utils::get_guid() + "}\") = \"" + project_name + "\", \"" + project_name + ".vcxproj\", \"{" + project_guid + "}\"\n";
 	output += "EndProject\n";
 	output += "Global\n";
 
@@ -191,7 +197,7 @@ void builder::set_globals(xml_string& string)
 			string += "\n";
 		}
 
-		string += xml_string(4, ' ') + "<RootNamespace>" + g_mod.get_project_name() + "</RootNamespace>";
+		string += xml_string(4, ' ') + "<RootNamespace>" + project_name + "</RootNamespace>";
 		string += "\n";
 
 		string += xml_string(4, ' ') + "<LatestTargetPlatformVersion>";
@@ -397,7 +403,7 @@ void builder::set_property_groups(xml_string& string)
 				string += "</IntDir>";
 				string += "\n";
 
-				string += xml_string(4, ' ') + "<TargetName>" + g_mod.get_project_name() + "</TargetName>";
+				string += xml_string(4, ' ') + "<TargetName>" + project_name + "</TargetName>";
 				string += "\n";
 
 				string += xml_string(4, ' ') + "<TargetExt>";
@@ -564,9 +570,9 @@ void builder::set_item_definition_groups(xml_string& string)
 					{
 						if (!defines_obj.empty())
 						{
-							for (const auto& dir : defines_obj)
+							for (const auto& def : defines_obj)
 							{
-								string += dir.asString() + ";";
+								string += def.asString() + ";";
 							}
 						}
 
@@ -616,9 +622,9 @@ void builder::set_item_definition_groups(xml_string& string)
 					{
 						string += xml_string(6, ' ') + "<AdditionalDependencies>";
 						{
-							for (const auto& dir : links_obj)
+							for (const auto& link : links_obj)
 							{
-								string += dir.asString() + ";";
+								string += link.asString() + ";";
 							}
 							string += "%(AdditionalDependencies)";
 						}
@@ -643,12 +649,34 @@ void builder::set_item_definition_groups(xml_string& string)
 
 void builder::set_source_files(xml_string& string)
 {
-	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _source_files;
 	
 	for (const auto& file : files_obj)
-		if (is_cpp(file))
-			_source_files.push_back(file.asString());
+	{
+		std::string file_name = file.asString();
+		std::string file_path = project_path + "\\" + file_name;
+
+		if (std::filesystem::is_regular_file(file_path))
+		{
+			if (is_cpp(file_name))
+				_source_files.push_back(file_name);
+		}
+		else if (std::filesystem::is_directory(file_path))
+		{
+			char* files[MAX_FILES];
+			int   file_num = 0;
+
+			fs::get_directory_files(file_path, files, &file_num, fmRecursive);
+
+			for (int i = 0; i < file_num; i++)
+			{
+				std::string corr = utils::replace_patterns(files[i], { project_path + "\\" }, { "" });
+
+				if (is_cpp(corr))
+					_source_files.push_back(corr);
+			}
+		}
+	}
 
 	if (_source_files.empty())
 		return;
@@ -668,12 +696,34 @@ void builder::set_source_files(xml_string& string)
 
 void builder::set_header_files(xml_string& string)
 {
-	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _header_files;
 
 	for (const auto& file : files_obj)
-		if (is_hpp(file))
-			_header_files.push_back(file.asString());
+	{
+		std::string file_name = file.asString();
+		std::string file_path = project_path + "\\" + file_name;
+
+		if (std::filesystem::is_regular_file(file_path))
+		{
+			if (is_hpp(file_name))
+				_header_files.push_back(file_name);
+		}
+		else if (std::filesystem::is_directory(file_path))
+		{
+			char* files[MAX_FILES];
+			int   file_num = 0;
+
+			fs::get_directory_files(file_path, files, &file_num, fmRecursive);
+
+			for (int i = 0; i < file_num; i++)
+			{
+				std::string corr = utils::replace_patterns(files[i], { project_path + "\\" }, { "" });
+
+				if (is_hpp(corr))
+					_header_files.push_back(corr);
+			}
+		}
+	}
 
 	if (_header_files.empty())
 		return;
@@ -693,12 +743,34 @@ void builder::set_header_files(xml_string& string)
 
 void builder::set_library_files(xml_string& string)
 {
-	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _library_files;
 
 	for (const auto& file : files_obj)
-		if (is_lib(file))
-			_library_files.push_back(file.asString());
+	{
+		std::string file_name = file.asString();
+		std::string file_path = project_path + "\\" + file_name;
+
+		if (std::filesystem::is_regular_file(file_path))
+		{
+			if (is_lib(file_name))
+				_library_files.push_back(file_name);
+		}
+		else if (std::filesystem::is_directory(file_path))
+		{
+			char* files[MAX_FILES];
+			int   file_num = 0;
+
+			fs::get_directory_files(file_path, files, &file_num, fmRecursive);
+
+			for (int i = 0; i < file_num; i++)
+			{
+				std::string corr = utils::replace_patterns(files[i], { project_path + "\\" }, { "" });
+
+				if (is_lib(corr))
+					_library_files.push_back(corr);
+			}
+		}
+	}
 
 	if (_library_files.empty())
 		return;
@@ -718,12 +790,34 @@ void builder::set_library_files(xml_string& string)
 
 void builder::set_other_files(xml_string& string)
 {
-	Json::Value files_obj = g_mod.get()["settings"]["files"];
 	std::vector<std::string> _other_files;
 
 	for (const auto& file : files_obj)
-		if (!is_cpp(file) && !is_hpp(file) && !is_lib(file))
-			_other_files.push_back(file.asString());
+	{
+		std::string file_name = file.asString();
+		std::string file_path = project_path + "\\" + file_name;
+
+		if (std::filesystem::is_regular_file(file_path))
+		{
+			if (!is_cpp(file_name) && !is_hpp(file_name) && !is_lib(file_name))
+				_other_files.push_back(file_name);
+		}
+		else if (std::filesystem::is_directory(file_path))
+		{
+			char* files[MAX_FILES];
+			int   file_num = 0;
+
+			fs::get_directory_files(file_path, files, &file_num, fmRecursive);
+
+			for (int i = 0; i < file_num; i++)
+			{
+				std::string corr = utils::replace_patterns(files[i], { project_path + "\\" }, { "" });
+
+				if (!is_cpp(corr) && !is_hpp(corr) && !is_lib(corr))
+					_other_files.push_back(corr);
+			}
+		}
+	}
 
 	if (_other_files.empty())
 		return;
@@ -746,25 +840,25 @@ void builder::set_end_base(xml_string& string)
 	string += "</Project>";
 }
 
-static bool is_cpp(const Json::Value& object)
+static bool is_cpp(const std::string& object)
 {
 	return
-		utils::get_file_extension(object.asString()) == "c" ||
-		utils::get_file_extension(object.asString()) == "cc" ||
-		utils::get_file_extension(object.asString()) == "cpp";
+		utils::get_file_extension(object) == "c" ||
+		utils::get_file_extension(object) == "cc" ||
+		utils::get_file_extension(object) == "cpp";
 }
 
-static bool is_hpp(const Json::Value& object)
+static bool is_hpp(const std::string& object)
 {
 	return
-		utils::get_file_extension(object.asString()) == "h" ||
-		utils::get_file_extension(object.asString()) == "hh" ||
-		utils::get_file_extension(object.asString()) == "hpp";
+		utils::get_file_extension(object) == "h" ||
+		utils::get_file_extension(object) == "hh" ||
+		utils::get_file_extension(object) == "hpp";
 }
 
-static bool is_lib(const Json::Value& object)
+static bool is_lib(const std::string& object)
 {
-	return utils::get_file_extension(object.asString()) == "lib";
+	return utils::get_file_extension(object) == "lib";
 }
 
 static void fast_link(xml_string& string, const xml_string& param)

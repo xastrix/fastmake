@@ -1,8 +1,9 @@
-#include "builder/builder.h"
-#include "fs/fs.h"
+#include "client.h"
 
 int main(int argc, const char** argv)
 {
+	setlocale(LC_ALL, "");
+	
 	if (argc < 2) {
 		printf("usage: fastmake <path>\n");
 		printf("to get more information read's the docs\n");
@@ -14,7 +15,7 @@ int main(int argc, const char** argv)
 
 		for (int i = 0; i < file_num; i++)
 		{
-			if (std::filesystem::is_regular_file(files[i]))
+			if (fs::exists(files[i]).as(objectExists))
 			{
 				if (strstr(files[i], SOURCE_PROJECT_CONFIGURATION_FILENAME) != 0)
 				{
@@ -32,7 +33,7 @@ int main(int argc, const char** argv)
 					}
 				}
 			}
-			else if (std::filesystem::is_directory(files[i]))
+			else if (fs::exists(files[i]).as(dirExists))
 			{
 				int new_num = 0;
 				fs::get_directory_files(files[i], files, &new_num, fmRecursive);

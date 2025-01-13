@@ -48,8 +48,8 @@ std::string mod::get_err()
 
 Json::Value mod::get()
 {
-	if (!json_module_data.empty())
-		return json_module_data;
+	if (json_module_data.empty())
+		return Json::Value{ Json::objectValue };
 
-	return Json::Value{ Json::objectValue };
+	return json_module_data;
 }

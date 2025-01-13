@@ -2,6 +2,26 @@
 
 #include <windows.h>
 
+fs_exists fs::exists(const std::string& path)
+{
+	struct stat      s;
+	struct fs_exists o;
+
+	o._status = noneExists;
+
+	if (stat(path.c_str(), &s) == 0)
+	{
+		if (s.st_mode & S_IFDIR) {
+			o._status = dirExists;
+		}
+		else if (s.st_mode & S_IFREG) {
+			o._status = objectExists;
+		}
+	}
+
+	return o;
+}
+
 bool fs::create_object(const std::string& path, const std::string& data)
 {
 	std::filesystem::path file_path = path;

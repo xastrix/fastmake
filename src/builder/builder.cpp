@@ -656,12 +656,12 @@ void builder::set_source_files(xml_string& string)
 		std::string file_name = file.asString();
 		std::string file_path = project_path + "\\" + file_name;
 
-		if (std::filesystem::is_regular_file(file_path))
+		if (fs::exists(file_path).as(objectExists))
 		{
 			if (is_cpp(file_name))
 				_source_files.push_back(file_name);
 		}
-		else if (std::filesystem::is_directory(file_path))
+		else if (fs::exists(file_path).as(dirExists))
 		{
 			char* files[MAX_FILES];
 			int   file_num = 0;
@@ -703,12 +703,12 @@ void builder::set_header_files(xml_string& string)
 		std::string file_name = file.asString();
 		std::string file_path = project_path + "\\" + file_name;
 
-		if (std::filesystem::is_regular_file(file_path))
+		if (fs::exists(file_path).as(objectExists))
 		{
 			if (is_hpp(file_name))
 				_header_files.push_back(file_name);
 		}
-		else if (std::filesystem::is_directory(file_path))
+		else if (fs::exists(file_path).as(dirExists))
 		{
 			char* files[MAX_FILES];
 			int   file_num = 0;
@@ -750,12 +750,12 @@ void builder::set_library_files(xml_string& string)
 		std::string file_name = file.asString();
 		std::string file_path = project_path + "\\" + file_name;
 
-		if (std::filesystem::is_regular_file(file_path))
+		if (fs::exists(file_path).as(objectExists))
 		{
 			if (is_lib(file_name))
 				_library_files.push_back(file_name);
 		}
-		else if (std::filesystem::is_directory(file_path))
+		else if (fs::exists(file_path).as(dirExists))
 		{
 			char* files[MAX_FILES];
 			int   file_num = 0;
@@ -797,12 +797,12 @@ void builder::set_other_files(xml_string& string)
 		std::string file_name = file.asString();
 		std::string file_path = project_path + "\\" + file_name;
 
-		if (std::filesystem::is_regular_file(file_path))
+		if (fs::exists(file_path).as(objectExists))
 		{
 			if (!is_cpp(file_name) && !is_hpp(file_name) && !is_lib(file_name))
 				_other_files.push_back(file_name);
 		}
-		else if (std::filesystem::is_directory(file_path))
+		else if (fs::exists(file_path).as(dirExists))
 		{
 			char* files[MAX_FILES];
 			int   file_num = 0;

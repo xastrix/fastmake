@@ -20,8 +20,7 @@ project (proj)
 	   "src/mod/**",
 	   "src/utils/**",
 	   "src/builder/**",
-	   
-	   "src/*.cpp"
+	   "src/client/**"
 	}
 
 	externalincludedirs "src/dependencies/jsoncpp/include"
